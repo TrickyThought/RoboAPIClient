@@ -17,18 +17,27 @@ using RestSharp;
 
 namespace RoboAPIClient
 {
-    public class MoveRequestParameters
+    public class MoveRequestParametersSpeed
     {
         public float speed;
-        public float duration;
 
-        public MoveRequestParameters(float speed, float duration)
+        public MoveRequestParametersSpeed(float speed)
         {
             this.speed = speed;
+        }
+    }
+
+    public class MoveRequestParametersSpeedAndDuration : MoveRequestParametersSpeed
+    {
+        public float duration;
+
+        public MoveRequestParametersSpeedAndDuration(float speed, float duration)
+            : base(speed)
+        {
             this.duration = duration;
         }
     }
-    
+
     /*public class MoveResponse
     {
         [JsonProperty(PropertyName = "name")]
@@ -89,13 +98,50 @@ namespace RoboAPIClient
 
         public string SendRequest(string url)
         {
+            float speed;
+            string speedParseRes = ParseSpeed(out speed);
+            if (speedParseRes != null)
+                return speedParseRes;
+
+            float duration;
+            bool durationParseRes = ParseDuration(out duration);
+
             var client = new RestClient(url);
             var request = new RestRequest();
             request.Method = Method.PUT;
-            request.AddJsonBody(new MoveRequestParameters(99.9f, 0.9f));
+
+            request.AddJsonBody(durationParseRes ? 
+                new MoveRequestParametersSpeedAndDuration(speed, duration) : 
+                new MoveRequestParametersSpeed(speed));
+
             var response = client.Execute(request);
 
             return response.Content;
+        }
+
+        private string ParseSpeed(out float speed)
+        {
+            if (!float.TryParse(textBoxSpeed.Text, out speed))
+            {
+                return "Error: failed to parse speed!";
+            }
+
+            if (speed < 0.0 || speed > 1.0)
+            {
+                return "Error: speed must be 0 <= speed <= 1.0!";
+            }
+
+            return null;
+        }
+
+        private bool ParseDuration(out float duration)
+        {
+            if (!float.TryParse(textBoxDuration.Text, out duration) || duration < 0.0)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void Grid_KeyDown(object sender, KeyEventArgs e)
