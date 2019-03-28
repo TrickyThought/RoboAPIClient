@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -93,9 +94,19 @@ namespace RoboAPIClient
 
         private void Stop_Click(object sender, RoutedEventArgs e)
         {
+            StopMovement();
+        }
+
+        private void StopMovement()
+        {
             textBlockResponse.Text = SendRequest(stopURI);
         }
 
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            StopMovement();
+            base.OnClosing(e);
+        }
         public string SendRequest(string url)
         {
             float speed;
