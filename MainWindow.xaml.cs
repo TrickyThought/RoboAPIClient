@@ -137,9 +137,9 @@ namespace RoboAPIClient
                 return "Error: failed to parse speed!";
             }
 
-            if (speed < 0.0 || speed > 1.0)
+            if (speed < 0.0 || speed > 250.0)
             {
-                return "Error: speed must be 0 <= speed <= 1.0!";
+                return "Error: speed must be 0 <= speed <= 250.0!";
             }
 
             return null;
